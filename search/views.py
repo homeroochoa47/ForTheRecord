@@ -1,14 +1,15 @@
 from json import JSONDecodeError, dumps
 from django.shortcuts import render, redirect
-from django.views import View
 from requests import Request, post, get
 from .creds import REDIRECT_URI, CLIENT_ID, CLIENT_SECRET, youtube_api_key, api_service_name, api_version
-from .utils import create_or_update_auth_info, check_spotify_authentication, get_user_auth_data, retrieve_comment_info_from_json
+from .utils import create_or_update_auth_info, check_spotify_authentication, get_user_auth_data, retrieve_comment_info_from_json, retrieve_sporify_user_data
 import html
 from rest_framework.views import APIView
 from requests import Request, post
 from rest_framework import status
 from rest_framework.response import Response
+from django.contrib.auth import authenticate, login
+from api.models import User
 
 #for youtube API
 import os
@@ -24,7 +25,7 @@ import googleapiclient.errors
 class SpotifyAuth(APIView):
     
     def get(self, request, format=None):
-        scopes = ('user-read-currently-playing')
+        scopes = ('user-read-currently-playing', 'user-read-private')
         
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
             'scope': scopes,
@@ -46,29 +47,44 @@ def spotify_callback(request):
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET
     }).json()
-    
+                                                         
     #storing data from the json above
     access_token = response.get('access_token')
     token_type = response.get('token_type')
     expires_in = response.get('expires_in')
     refresh_token = response.get('refresh_token')
     
-    #TODO: Add a method to also retrieve the current user's profile and check if they are already associated with a User object in the API database. If they are then we'll log them in and return access to all of their tokens and auth info. If they arent then we create a new user object with their User ID and add all of the auth info to it. Either way we redirect them to the next page with access to all of this info.
+    spotify_user_id = retrieve_sporify_user_data(access_token)
     
-    #request user ID util function
-    #Authenticate using the custom auth_backend
-        #return user if they are already in the database
-        #create a new model if not
+    print(spotify_user_id)
     
+    #TODO: Condense this whole section into an authenticate and login util function, dont forget to make the session
     
     if not request.session.exists(request.session.session_key): #if there is no session
         request.session.create() #make a session
+    
+    user = authenticate(
+        request=request,
+        username=spotify_user_id
+    )
+    
+    if user is not None:
+        login(request, user)
+    else:
+        print('Something went wrong')
+        
+    print (request.user.is_authenticated)
+    print (request.user)
+    
+    #then we use this link (https://docs.djangoproject.com/en/4.1/topics/auth/default/#auth-web-requests) to log the user in and save their authenticated status to the session/session.user status. From there theyll have access to the other data.
         
     #update the data associated to the session key
-    create_or_update_auth_info(request.session.session_key, access_token, expires_in, refresh_token, token_type)
+    create_or_update_auth_info(request.user, access_token, expires_in, refresh_token, token_type)
+    print (User.objects.get(username=spotify_user_id).auth_info)
     
-    #add an if statement to check if there are errors before redirecting, handle the errors if there are
-    return redirect('/search/spotify_search') 
+    return Response([spotify_user_id, request.user.is_authenticated])
+    
+    #return redirect('/search/spotify_search')
 
 
 #calls the spotify api for the users currently playing song
