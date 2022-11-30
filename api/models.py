@@ -20,8 +20,6 @@ class Song(models.Model):
     song_artist_info = models.CharField(max_length=100)
     comments = models.ForeignKey(CommentList, on_delete=models.CASCADE)
 
-
-#FIXME: need to sort out linking the authinfo model from search to the authinfo field here.
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50, unique=True)
     auth_info = models.ForeignKey(AuthInfo, on_delete=models.CASCADE, default=None, null=True)
@@ -38,3 +36,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
     
+    def update_auth_info(self, auth_info_object):
+        self.auth_info = auth_info_object
+        self.save(update_fields=['auth_info'])
+        
+    def update_last_searched_song(self, last_song_object):
+        self.last_searched_song = last_song_object
+        self.save(update_fields=['last_searched_song'])

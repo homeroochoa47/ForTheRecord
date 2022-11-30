@@ -2,7 +2,7 @@ from json import JSONDecodeError, dumps
 from django.shortcuts import render, redirect
 from requests import Request, post, get
 from .creds import REDIRECT_URI, CLIENT_ID, CLIENT_SECRET, youtube_api_key, api_service_name, api_version
-from .utils import create_or_update_auth_info, check_spotify_authentication, get_user_auth_data, retrieve_comment_info_from_json, retrieve_sporify_user_data
+from .utils import create_or_update_auth_info, check_spotify_authentication, get_user_auth_data, retrieve_comment_info_from_json, retrieve_sporify_user_data, get_user_from_api_model
 import html
 from rest_framework.views import APIView
 from requests import Request, post
@@ -17,11 +17,8 @@ import googleapiclient.discovery
 import googleapiclient.errors
 
 #TODO: Update views here to add data to appropriate models.
-#TODO: Make a couple of model instances to test out functionality
 #TODO: Figure out if we're going to have separate functionality depending on whether or not a user is logged in
 
-#this will be the initial url called by the frontend get method.
-#the way this connects is by returning the url as a response to the get request, which in turn send the user to the spotify auth page, and afterwards redirects them to the spotify callback function below. 
 class SpotifyAuth(APIView):
     
     def get(self, request, format=None):
@@ -36,9 +33,9 @@ class SpotifyAuth(APIView):
         
         return Response({'url': url}, status=status.HTTP_200_OK)
     
-#from here we take the access code, 'code' that we get from the url that spotify redirects us to and send a post response to the spotify API with the code and the information we;re requesting. we then store that data in the database with the session ID and redirect the user to wherever theyre going to next. 
-#we can set this up where we can check the session as soon as they go to the page and create a page for them to authenticate before they can do anything else. 
+
 def spotify_callback(request):
+    #TODO: We might need to remake this to avoid just getting a new auth token every time, and instead have it check if theres one present/if its expired and go from there
     code = request.GET.get('code')
     response = post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'authorization_code',
@@ -56,8 +53,6 @@ def spotify_callback(request):
     
     spotify_user_id = retrieve_sporify_user_data(access_token)
     
-    print(spotify_user_id)
-    
     #TODO: Condense this whole section into an authenticate and login util function, dont forget to make the session
     
     if not request.session.exists(request.session.session_key): #if there is no session
@@ -72,26 +67,17 @@ def spotify_callback(request):
         login(request, user)
     else:
         print('Something went wrong')
-        
-    print (request.user.is_authenticated)
-    print (request.user)
     
-    #then we use this link (https://docs.djangoproject.com/en/4.1/topics/auth/default/#auth-web-requests) to log the user in and save their authenticated status to the session/session.user status. From there theyll have access to the other data.
-        
     #update the data associated to the session key
     create_or_update_auth_info(request.user, access_token, expires_in, refresh_token, token_type)
     print (User.objects.get(username=spotify_user_id).auth_info)
     
-    return Response([spotify_user_id, request.user.is_authenticated])
-    
-    #return redirect('/search/spotify_search')
-
+    return redirect('/search/spotify_search')
 
 #calls the spotify api for the users currently playing song
 def get_current_track(request):
-    session_id = request.session.session_key
-    user_auth_data = get_user_auth_data(session_id)
-    user_auth_token = user_auth_data.access_token
+    user_object = get_user_from_api_model(request.user)
+    user_auth_token = user_object.auth_info.access_token
     
     try:
         track_info = get('https://api.spotify.com/v1/me/player/currently-playing?market=us',
@@ -100,12 +86,11 @@ def get_current_track(request):
                 }).json()
     except JSONDecodeError: #this is the error we get if the music on spotify is paused/nothing is playing
         return render(request, 'JSONDecodeError/JSONDecodeError.html')
-        #return HttpResponse("Looks like spotify wasn't playing a song. Make sure to hit play.")
-        #make a new template with a nice error page asking the user to play a song or manually search
+        #TODO: change this to a Rest Framework error message instead
         
     #filtering through the json dict for the info we want
     #we might be able to do this more efficiently with the get() function
-    track_name = track_info['item']['name'] 
+    track_name = track_info['item']['name']
     artists = track_info['item']['artists']
     artist_names = ', '.join([artist['name'] for artist in artists])
     image_url = track_info['item']['album']['images'][1]['url']

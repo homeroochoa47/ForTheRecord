@@ -13,38 +13,48 @@ def get_user_auth_data(user_id):
         return user_data[0]
     else:
         return None
+    
+def get_user_from_api_model(user_id):
+    user_query = User.objects.filter(username=user_id)
+    
+    if user_query.exists():
+        return user_query[0]
+    else:
+        return None
 
 def create_or_update_auth_info(user_id, access_token, expires_in, refresh_token, token_type):
-    user = User.objects.get(username=user_id)
-    print (User.objects.get(username=user_id).auth_info)
     
     #converts expires_in from seconds (3600 usually) to the actual time the token will expire at
     if type(expires_in) == int:
         expire_time = timezone.now() + timedelta(seconds=expires_in)
     else:
        expire_time = expires_in
-       
+    
+    user_object = get_user_from_api_model(user_id)
     user_data = get_user_auth_data(user_id)
     
     #make a new model instance if theres no data for the specific session id
     if not user_data:
         auth_data_instance = AuthInfo(
             user_id = user_id,
-            user = user,
             access_token = access_token,
             refresh_token = refresh_token, 
             expires_in = expire_time,
             token_type = token_type
         )
         auth_data_instance.save()
-        User.objects.filter(username=user_id).update(auth_info=auth_data_instance)
+        user_object.update_auth_info(auth_data_instance)
+        print(f'created new auth_info relation for {user_id}')
+        
     #otherwise update the previous values from this session with the new ones
     else:
         user_data.access_token = access_token
         user_data.expires_in = expire_time
         user_data.token_type = token_type
         user_data.save(update_fields=['access_token', 'expires_in', 'token_type'])
-
+        new_auth_info = AuthInfo.objects.get(user_id=user_id)
+        user_object.update_auth_info(new_auth_info)
+        print(f'updated previous auth_info object for {user_id}')
         
 def check_spotify_authentication(user_id):
     user_data = get_user_auth_data(user_id)
@@ -55,7 +65,6 @@ def check_spotify_authentication(user_id):
             return True
     return False
 
-#somethings wrong here, maybe in the response
 def refresh_spotify_token(user_id):
     refresh_token = get_user_auth_data(user_id).refresh_token
 
