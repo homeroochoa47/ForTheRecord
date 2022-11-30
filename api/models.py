@@ -18,7 +18,7 @@ class Song(models.Model):
     album_name = models.CharField(max_length=75)
     album_release_date = models.IntegerField()
     song_artist_info = models.CharField(max_length=100)
-    comments = models.ForeignKey(CommentList, on_delete=models.CASCADE)
+    comments = models.ForeignKey(CommentList, on_delete=models.CASCADE, null=True)
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=50, unique=True)

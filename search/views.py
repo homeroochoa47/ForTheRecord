@@ -9,7 +9,7 @@ from requests import Request, post
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login
-from api.models import User
+from api.models import User, Song
 
 #for youtube API
 import os
@@ -88,6 +88,7 @@ def get_current_track(request):
         return render(request, 'JSONDecodeError/JSONDecodeError.html')
         #TODO: change this to a Rest Framework error message instead
         
+    print (track_info)
     #filtering through the json dict for the info we want
     #we might be able to do this more efficiently with the get() function
     track_name = track_info['item']['name']
@@ -98,6 +99,20 @@ def get_current_track(request):
     album_release_date = track_info['item']['album']['release_date']
     song_artist_info = (f'{track_name} {artist_names}')
 
+    searched_song = Song(
+        song_name = track_name,
+        artists = artist_names,
+        image_url = image_url,
+        album_name = album_name,
+        album_release_date = album_release_date[0:4],
+        song_artist_info = song_artist_info
+        )
+    
+    searched_song.save()
+    #TODO: Not sure if we wanna accumulate the searched songs in the database every time. Find some good database maintainance practices for this.
+    
+    user_object.update_last_searched_song(searched_song)
+    
     request.session['song_info'] = {
         'song_artist_info': song_artist_info,
         'artists': artist_names, 'track': track_name,
