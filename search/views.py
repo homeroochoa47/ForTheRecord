@@ -87,8 +87,7 @@ def get_current_track(request):
     except JSONDecodeError: #this is the error we get if the music on spotify is paused/nothing is playing
         return render(request, 'JSONDecodeError/JSONDecodeError.html')
         #TODO: change this to a Rest Framework error message instead
-        
-    print (track_info)
+    
     #filtering through the json dict for the info we want
     #we might be able to do this more efficiently with the get() function
     track_name = track_info['item']['name']
@@ -112,6 +111,7 @@ def get_current_track(request):
     #TODO: Not sure if we wanna accumulate the searched songs in the database every time. Find some good database maintainance practices for this.
     
     user_object.update_last_searched_song(searched_song)
+    print(f'\n\nSONG HERE {user_object.last_searched_song}\n\n')
     
     request.session['song_info'] = {
         'song_artist_info': song_artist_info,
