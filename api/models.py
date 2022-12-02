@@ -19,8 +19,12 @@ class Song(models.Model):
     album_release_date = models.IntegerField()
     song_artist_info = models.CharField(max_length=100)
     comments = models.ForeignKey(CommentList, on_delete=models.CASCADE, null=True)
+    
+    def __str__(self):
+        return (f'{self.song_name}, {self.artists}')
 
 class User(AbstractBaseUser, PermissionsMixin):
+    #TODO: might differentiate last searched song and currently searched song, or just save all of a users searched songs altogether
     username = models.CharField(max_length=50, unique=True)
     auth_info = models.ForeignKey(AuthInfo, on_delete=models.CASCADE, default=None, null=True)
     last_searched_song = models.ForeignKey(Song, on_delete=models.CASCADE, default=None, null=True)
@@ -41,5 +45,13 @@ class User(AbstractBaseUser, PermissionsMixin):
         self.save(update_fields=['auth_info'])
         
     def update_last_searched_song(self, last_song_object):
+        #if theres alreadt a last searched song, save the new one and delete the old model
+        if self.last_searched_song != 'null':
+            song_object = self.last_searched_song
+            print(f'LAST SONG: {song_object}')
+            self.last_searched_song = last_song_object
+            self.save(update_fields=['last_searched_song'])
+            Song.delete(song_object)
+            
         self.last_searched_song = last_song_object
         self.save(update_fields=['last_searched_song'])
