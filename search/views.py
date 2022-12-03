@@ -210,8 +210,7 @@ def retrieve_youtube_comments(request):
         #alternatively, return a new render with a separate html file for a new page reading the message we want.
     
     #this will be used to save the comments in the api CommentList model as a json
-    comments_json = dumps(comments)
-    comment_list = CommentList(comments = comments_json, song=current_song)
+    comment_list = CommentList(comments = comments, song=current_song)
     comment_list.save()
-    
+
     return Response(comment_list.comments)

@@ -2,6 +2,7 @@ from django.urls import path
 from .views import SpotifyAuth, spotify_callback, get_current_track, check_spotify_auth, search_youtube_videos, retrieve_youtube_comments
 
 urlpatterns = [
+    path('', check_spotify_auth),
     path('check_for_auth',check_spotify_auth, name='check_auth'),
     path('spotify_auth', SpotifyAuth.as_view()),
     path('redirect', spotify_callback, name='callback'),
