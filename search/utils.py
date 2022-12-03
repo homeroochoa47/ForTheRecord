@@ -56,14 +56,15 @@ def create_or_update_auth_info(user_id, access_token, expires_in, refresh_token,
         user_object.update_auth_info(new_auth_info)
         print(f'updated previous auth_info object for {user_id}')
         
-def check_spotify_authentication(user_id):
+def check_or_update_spotify_token_status(user_id):
+    #checks if the spotify token is expired, requests a new token if it is.
     user_data = get_user_auth_data(user_id)
-    
     if user_data:
         if user_data.expires_in < timezone.now():
             refresh_spotify_token(user_id)
-            return True
-    return False
+            'refreshed spotify auth_token'
+            return
+    print('\nspotify auth token still valid')
 
 def refresh_spotify_token(user_id):
     refresh_token = get_user_auth_data(user_id).refresh_token
@@ -79,7 +80,7 @@ def refresh_spotify_token(user_id):
     token_type = response.get('token_type')
     expires_in = response.get('expires_in')
     
-    create_or_update_auth_info(session_id, access_token, expires_in, refresh_token, token_type)
+    create_or_update_auth_info(user_id, access_token, expires_in, refresh_token, token_type)
     
 def retrieve_sporify_user_data(auth_token):
     user_info = get('https://api.spotify.com/v1/me',

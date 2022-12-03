@@ -2,21 +2,21 @@ from json import JSONDecodeError, dumps
 from django.shortcuts import render, redirect
 from requests import Request, post, get
 from .creds import REDIRECT_URI, CLIENT_ID, CLIENT_SECRET, youtube_api_key, api_service_name, api_version
-from .utils import create_or_update_auth_info, check_spotify_authentication, get_user_auth_data, retrieve_comment_info_from_json, retrieve_sporify_user_data, get_user_from_api_model
+from .utils import create_or_update_auth_info, check_or_update_spotify_token_status, get_user_auth_data, retrieve_comment_info_from_json, retrieve_sporify_user_data, get_user_from_api_model
 import html
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from requests import Request, post
 from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login
-from api.models import User, Song
+from api.models import User, Song, CommentList
 
 #for youtube API
 import os
 import googleapiclient.discovery
 import googleapiclient.errors
 
-#TODO: Update views here to add data to appropriate models.
 #TODO: Figure out if we're going to have separate functionality depending on whether or not a user is logged in
 
 class SpotifyAuth(APIView):
@@ -110,36 +110,26 @@ def get_current_track(request):
     searched_song.save()
     #TODO: Not sure if we wanna accumulate the searched songs in the database every time. Find some good database maintainance practices for this.
     
-    user_object.update_last_searched_song(searched_song)
-    print(f'\n\nSONG HERE {user_object.last_searched_song}\n\n')
-    
-    request.session['song_info'] = {
-        'song_artist_info': song_artist_info,
-        'artists': artist_names, 'track': track_name,
-        'album': album_name,
-        'cover_url': image_url,
-        'album_release_date': album_release_date[0:4]}
+    user_object.update_user_saved_songs(searched_song)
+    print(f'\n\nSONG HERE {user_object.current_searched_song}\n\n')
     
     return redirect('youtube_id_search')
 
 #check if there is a valid auth token for the access token. if there is, skip the auth process and go directly to get_current_track. If there isnt, get a new auth token.
 def check_spotify_auth(request):
-    try:
-        session = request.session.session_key
-        
-    except:
-        return redirect('/search/spotify_auth')
-    
-    authenticated = check_spotify_authentication(session) #returns a bool
-    if authenticated == True:
+    if request.user.is_authenticated:
+        check_or_update_spotify_token_status(request.user)
+        print('user is authenticated, sending to search\n')
         return redirect('/search/spotify_search')
     else:
+        print('user not authenticated, sending to auth\n')
+        #if we were to allow for functionality for anonymous users, this would be where we fork them elsewhere.
         return redirect('/search/spotify_auth')
 
     
 #Using the song information from the spotify track to search for video ID's for that song on youtube.
 def search_youtube_videos(request):
-    track_to_search = request.session['song_info']['song_artist_info']
+    track_to_search = request.user.current_searched_song.song_artist_info
        
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
@@ -172,12 +162,12 @@ def search_youtube_videos(request):
     
     return redirect('/search/comment_search')
 
-#make this an APIView that sends back the json file with the comments and song info to the front end instead of saving it in the session instead of passing the data as context
-#this will either involve 
+@api_view(['GET', 'POST'])
 def retrieve_youtube_comments(request):
-    video_ids = request.session['video_ids']
+    current_song = request.user.current_searched_song
+    video_ids = request.session['video_ids'] #TODO: maybe save this to the Song model?
     print (f'\n\nVIDEO IDS: {video_ids}\n\n')
-    comments = [] #maybe change to user data, list of dicts with user id, comment
+    comments = []
     
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
@@ -202,17 +192,16 @@ def retrieve_youtube_comments(request):
         )
         try:
             response = req.execute()
-        except googleapiclient.errors.HttpError:
-            continue
+        except googleapiclient.errors.HttpError: 
+            continue #move on to the next video
 
-        #checking the number of comments, allowing 20 max
+        #checking the number of comments, allowing 20 max per the request to the youtube api above: 'maxResults=20'
         number_of_comments = len(response['items'])
-        
         if number_of_comments == 0:
-            continue
+            continue #move on to the next video if there were no comments
 
-        for x in range(number_of_comments):
-            comment_data = retrieve_comment_info_from_json(x, response)
+        for i in range(number_of_comments):
+            comment_data = retrieve_comment_info_from_json(i, response) #returns the comment, youtube username, and profile image; will = None if comment is too long
             if comment_data is not None:
                 comments.append(comment_data)
     #if there werent any comments found
@@ -222,14 +211,7 @@ def retrieve_youtube_comments(request):
     
     #this will be used to save the comments in the api CommentList model as a json
     comments_json = dumps(comments)
+    comment_list = CommentList(comments = comments_json, song=current_song)
+    comment_list.save()
     
-    context = {
-        'yt_comments': comments,
-        'track_name': request.session['song_info']['track'],
-        'artists': request.session['song_info']['artists'],
-        'album': request.session['song_info']['album'],
-        'cover_url': request.session['song_info']['cover_url'],
-        'release_date': request.session['song_info']['album_release_date']
-    }
-    
-    return render(request, 'comments/comments.html', context)
+    return Response(comment_list.comments)
