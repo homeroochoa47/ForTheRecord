@@ -10,7 +10,7 @@ class CommentListSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('user_id','current_searched_song', 'last_searched_song')
+        fields = ('username','current_searched_song', 'last_searched_song')
         
 class SongSerializer(serializers.ModelSerializer):
     class Meta:
