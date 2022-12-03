@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import User, Song, CommentList
-from search.models import AuthInfo
 
 class CommentListSerializer(serializers.ModelSerializer):
     class Meta:
