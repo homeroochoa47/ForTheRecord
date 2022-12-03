@@ -1,17 +1,18 @@
 from rest_framework import serializers
 from .models import User, Song, CommentList
+from search.models import AuthInfo
 
 class CommentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommentList
-        fields = ('comment_list')
+        fields = ('comments','song')
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('user_id', 'auth_info', 'last_searched_song')
+        fields = ('user_id','current_searched_song', 'last_searched_song')
         
 class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
-        fields = ('song_name', 'artists', 'image_url', 'album_name', 'album_release_date', 'song_artist_info', 'comments')
+        fields = ('song_name', 'artists', 'image_url', 'album_name', 'album_release_date', 'song_artist_info')

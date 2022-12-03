@@ -24,7 +24,7 @@ class CommentList(models.Model):
     song = models.ForeignKey(Song, on_delete=models.CASCADE, null=True)
     
     def __str__(self):
-        return self.comment_list
+        return self.comments
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True)
