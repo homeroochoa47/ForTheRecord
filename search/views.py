@@ -72,7 +72,7 @@ def spotify_callback(request):
     create_or_update_auth_info(request.user, access_token, expires_in, refresh_token, token_type)
     print (User.objects.get(username=spotify_user_id).auth_info)
     
-    return redirect('/search/spotify_search')
+    return redirect('/home') #authenticates and then redirects back to the frontend
 
 #calls the spotify api for the users currently playing song
 def get_current_track(request):
@@ -212,5 +212,5 @@ def retrieve_youtube_comments(request):
     #this will be used to save the comments in the api CommentList model as a json
     comment_list = CommentList(comments = comments, song=current_song)
     comment_list.save()
-
+    
     return Response(comment_list.comments)
