@@ -6,8 +6,9 @@ This project was inspired by my frequent youtube searches when listening to musi
 
 Instead, a user can log into their Spotify account on this site and see a list of comments without having to go through the youtube search process. They'll also be able to save comments and songs, and make a nice graphic with comments that they'll be able to share.
 
-There are lots of features I'm interested in adding, such as artist information, lyrics, and a few other interactive components, but those will have to come as I add to the site over time. This is something that will have at least one user (me), so I want to keep adding to this whenever I have the time to work on it. 
+There are lots of features I'm interested in adding, such as artist information, lyrics, and a few other interactive components, but those will have to come as I add to the site over time. This is something that will have at least one user (me), so I want to keep adding to this whenever I have the time to work on it.
 
+Frontend is being done with React and Chakra UI
 ## Installation
 
 In progress
