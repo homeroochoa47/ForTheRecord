@@ -10,4 +10,3 @@ There are lots of features I'm interested in adding, such as artist information,
 
 ## Installation/Usage
 
-Installation and usage instructions will be posted here once I have gotten the frontend look and function closer to the vision I have for it! For now I run the site locally with Django and React, with credentials for the required APIs registered when needed.
