@@ -19,8 +19,8 @@ export function NavBar() {
     </a>
     <Spacer></Spacer>
     <ButtonGroup gap='2'>
-        <a href="/home"><Button colorScheme='teal' size='md'>Home</Button></a>
-        <a href="comments"><Button colorScheme='teal' size='md' href="/search/comment_search">Find My Song</Button></a>
+        <a href="/home"><Button colorScheme='green' bg='green.400' size='md'>Home</Button></a>
+        <a href="comments"><Button colorScheme='green' bg='green.400' size='md' href="/search/comment_search">Find My Song</Button></a>
     </ButtonGroup>
     <IconButton ml={8} icon={isDark ? <FaSun /> : <FaMoon />} isRound='true' onClick={toggleColorMode}></IconButton>
     </Flex>

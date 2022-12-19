@@ -23,7 +23,11 @@ export function Footer() {
                 spacing={4}
                 justify={{ base: 'center', md: 'space-between' }}
                 align="center">
-                    <Link href="https://github.com/homeroochoa47"> By Homero</Link>
+                    <Link href="https://github.com/homeroochoa47" 
+                        color="green.400"
+                        fontWeight={500}
+                        fontSize="ml"
+                    > By Homero</Link>
             </Container>
         </Box>
     );
