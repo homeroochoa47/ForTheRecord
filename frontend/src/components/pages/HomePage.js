@@ -11,13 +11,14 @@ import {
   useColorModeValue,
   createIcon,
 } from '@chakra-ui/react';
+import { CommentSearchButton } from "../buttons/CommentSearchButton";
 
 // TODO: have a login/logout button that also shows the users spotify username and profile picture somewhere on the screen at all times.
 // TODO: Add react routers to this redirect the user to the correct pages (components)
 
 export function HomePage() {
-  //handleButtonClick() {}
-  
+
+  //We have a comment search button component here that sends the user to the backend auth process and finds comments. More on this in the backend files.
   return (
     <>
       <Helmet>
@@ -52,15 +53,8 @@ export function HomePage() {
             align={'center'}
             alignSelf={'center'}
             position={'relative'}>
-            <a href="search/check_for_auth"><Button
-              colorScheme={'green'}
-              bg={'green.400'}
-              size='lg'
-              _hover={{
-                bg: 'green.500',
-              }}>
-              Lets do it!
-            </Button></a>
+            {/* Passing a button text prop since this button component is also in the navbar */}
+            <CommentSearchButton buttonText="Lets do it!"/> 
           </Stack>
         </Stack>
       </Container>
