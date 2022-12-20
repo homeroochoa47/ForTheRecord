@@ -31,7 +31,7 @@ class SpotifyAuth(APIView):
             'client_id': CLIENT_ID
         }).prepare().url
         
-        return Response({'url': url}, status=status.HTTP_200_OK)
+        return Response({'spotify_auth_url': url}, status=status.HTTP_200_OK)
     
 
 def spotify_callback(request):
@@ -72,7 +72,7 @@ def spotify_callback(request):
     create_or_update_auth_info(request.user, access_token, expires_in, refresh_token, token_type)
     print (User.objects.get(username=spotify_user_id).auth_info)
     
-    return redirect('/home') #authenticates and then redirects back to the frontend
+    return redirect('/comments') #authenticates and then redirects back to the frontend
 
 #calls the spotify api for the users currently playing song
 def get_current_track(request):

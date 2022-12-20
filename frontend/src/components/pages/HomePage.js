@@ -34,7 +34,7 @@ export function HomePage() {
           spacing={{ base: 8, md: 4 }}
           py={{ base: 20, md: 36 }}>
           <Heading
-            paddingTop={'10%'}
+            paddingTop={'5%'}
             fontWeight={600}
             fontSize={{ base: '2xl', sm: '4xl', md: '6xl' }}
             lineHeight={'110%'}>
