@@ -6,6 +6,8 @@ import { Button, Box, ButtonGroup } from "@chakra-ui/react"
 import { Flex, VStack, Heading, Spacer } from "@chakra-ui/layout";
 import { FaSun, FaMoon, } from 'react-icons/fa'
 
+// TODO: have a login/logout button that also shows the users spotify username and profile picture somewhere on the screen at all times.
+
 export function NavBar() {
   const { colorMode, toggleColorMode } = useColorMode();
   const isDark = colorMode === "dark";
