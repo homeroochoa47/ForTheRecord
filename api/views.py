@@ -17,7 +17,8 @@ class CommentListView(APIView):
     def get(self, request, format=None):
         current_song = request.user.current_searched_song
         comment_list = CommentList.objects.filter(song=current_song)
-        print (f'\n\nLIST HERE {comment_list[0]}\n\n')
+        
+        #the data is returned as an object with the comments and the song data
         data = CommentListSerializer(comment_list[0]).data
         return Response(data, status=status.HTTP_200_OK)
     

@@ -213,4 +213,5 @@ def retrieve_youtube_comments(request):
     comment_list = CommentList(comments = comments, song=current_song)
     comment_list.save()
     
-    return Response(comment_list.comments)
+    return redirect('/api/comments')
+    #return Response(comment_list.comments)
