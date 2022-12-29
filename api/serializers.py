@@ -13,7 +13,7 @@ class CommentListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = CommentList
-        fields = ('comments','song')
+        fields = ('new_comments','song')
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

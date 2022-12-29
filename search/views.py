@@ -16,6 +16,7 @@ from api.models import User, Song, CommentList
 import os
 import googleapiclient.discovery
 import googleapiclient.errors
+import json
 
 #TODO: Figure out if we're going to have separate functionality depending on whether or not a user is logged in
 
@@ -209,8 +210,10 @@ def retrieve_youtube_comments(request):
         comments = [{'comment': "Sorry, looks like we werent able to find any comments"}]
         #alternatively, return a new render with a separate html file for a new page reading the message we want.
     
+    #comments=json.dumps(comments)
+    #print(f'\n\n\nCOMMENTS JSON HERE{json.dumps(comments)}')
     #this will be used to save the comments in the api CommentList model as a json
-    comment_list = CommentList(comments = comments, song=current_song)
+    comment_list = CommentList(new_comments=comments, song=current_song)
     comment_list.save()
     
     return redirect('/api/comments')

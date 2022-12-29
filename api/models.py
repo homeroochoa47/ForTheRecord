@@ -20,11 +20,12 @@ class Song(models.Model):
 
 class CommentList(models.Model):
     #have the comments saved here in a json with the username of the commenter
-    comments = models.TextField()
+    comments = models.TextField(null=True)
     song = models.ForeignKey(Song, on_delete=models.CASCADE, null=True)
+    new_comments = models.JSONField(default=[])
     
     def __str__(self):
-        return self.comments
+        return self.new_comments
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True)
