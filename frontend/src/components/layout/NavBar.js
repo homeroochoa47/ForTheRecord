@@ -1,9 +1,8 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { useColorMode } from "@chakra-ui/color-mode";
 import { IconButton } from "@chakra-ui/button";
 import { Button, Box, ButtonGroup } from "@chakra-ui/react"
-import { Flex, VStack, Heading, Spacer } from "@chakra-ui/layout";
+import { Flex, VStack, Heading, Spacer, Container } from "@chakra-ui/layout";
 import { FaSun, FaMoon, } from 'react-icons/fa'
 
 // TODO: have a login/logout button that also shows the users spotify username and profile picture somewhere on the screen at all times.
@@ -13,18 +12,19 @@ export function NavBar() {
   const isDark = colorMode === "dark";
 
   return (
-    <Flex width='90%' alignItems='center'>
-    <a href="home">
-      <Heading
-        ml="8" size="lg" fontWeight='semibold' color="green.400">ForTheRecord
-        </Heading>
-    </a>
-    <Spacer></Spacer>
-    <ButtonGroup gap='2'>
-        <a href="/home"><Button colorScheme='green' bg='green.400' size='md'>Home</Button></a>
-        <a href="comments"><Button colorScheme='green' bg='green.400' size='md' href="/search/comment_search">Find My Song</Button></a>
-    </ButtonGroup>
-    <IconButton ml={8} icon={isDark ? <FaSun /> : <FaMoon />} isRound='true' onClick={toggleColorMode}></IconButton>
+    <Flex width='100%' alignItems='center' justifyContent={{base: 'space-around', sm: 'space-between', md: 'space-around', lg: 'space-around'}}>
+      <a href="home">
+        <Heading
+          size="lg" fontWeight='semibold' color='#698396'>ForTheRecord
+          </Heading>
+      </a>
+      <Flex>
+        <ButtonGroup gap={{base: 2, sm: 1}}>
+            <a href="/home"><Button colorScheme='green' bg='#698396' size='md'>Home</Button></a>
+            <a href="comments"><Button colorScheme='green' bg='#698396' size='md' href="/search/comment_search">Find My Song</Button></a>
+        </ButtonGroup>
+        <IconButton ml={{base: 8, sm: 4}} icon={isDark ? <FaSun /> : <FaMoon />} isRound='true' onClick={toggleColorMode}></IconButton>
+      </Flex>
     </Flex>
   );
 } 

@@ -9,7 +9,7 @@ export function CommentSearchButton(props) {
     <Link as={RouterLink} to='/comments' style={{ textDecoration: 'none' }}>
       <Button
       colorScheme='green' 
-      bg={'green.400'} 
+      bg={'#698396'} 
       size='lg' 
       hover={{bg: 'green.500'}}>
       {props.buttonText}

@@ -12,10 +12,11 @@ import {
 export function Footer() {
     return (
         <Box
-            bg={useColorModeValue('gray.50', 'gray.900')}
+            bg={useColorModeValue('#D8CFB1', 'gray.900')}
             pos="fixed"
-            w="100%"
-            bottom="0">
+            minW="100%"
+            bottom="0"
+            left="0">
             <Container
                 maxW="100%"
                 py={4}
@@ -24,7 +25,7 @@ export function Footer() {
                 justify={{ base: 'center', md: 'space-between' }}
                 align="center">
                     <Link href="https://github.com/homeroochoa47" 
-                        color="green.400"
+                        color="#698396"
                         fontWeight={500}
                         fontSize="ml"
                     > By Homero</Link>

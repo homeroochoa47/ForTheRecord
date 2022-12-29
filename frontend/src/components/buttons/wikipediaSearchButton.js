@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from '@chakra-ui/react'
+import { Button, useColorModeValue } from '@chakra-ui/react'
 
 async function getWikipediaPageId(artistName) {
     try {
@@ -21,11 +21,11 @@ export function WikipediaSearchButton(props) {
     const handleClick = async () => {
       const pageId = await getWikipediaPageId(props.artist);
       // Redirect the user to the Wikipedia page for the artist
-      window.location.href = `https://en.wikipedia.org/?curid=${pageId}`;
+      window.open(`https://en.wikipedia.org/?curid=${pageId}`, '_blank');
     }
-  
+
     return (
-      <Button variant='solid' colorScheme='blue' onClick={handleClick}>
+      <Button variant='solid' bg={useColorModeValue("gray.300", "gray.600")} onClick={handleClick}>
         More about this artist
       </Button>
     );

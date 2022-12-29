@@ -5,7 +5,7 @@ import { ChakraProvider, theme, Heading, Text, Box, useColorModeValue, useColorM
 export function CommentCard(props) {
 
     return(
-        <Card bg='useColorModeValue' p>
+        <Card bg={useColorModeValue("#698396", "#5A745D")}>
             <CardHeader>
                 <Flex spacing='4'>
                     <Flex flex='1' gap='4' alignItems='center' flexWrap='wrap'>
@@ -14,20 +14,21 @@ export function CommentCard(props) {
                             alt={'Author'}/>
                         <Box>
                             <Heading size='md'
-                                color="green.400"
+                                color={useColorModeValue("black", "white")}
                             >{props.commentData.user}</Heading>
                         </Box>
                     </Flex>
                 </Flex>
             </CardHeader>
             <CardBody>
-                <Text
-                    color={useColorModeValue("gray.600", "pink.100")}
-                    fontWeight={700}
-                    fontSize="sm"
-                    justifyContent='center'>
-                    {props.commentData.comment}
-                </Text>
+                <Box display='flex' alignItems='baseline'>
+                    <Text
+                        color={useColorModeValue("black", "white")}
+                        fontWeight={500}
+                        fontSize="sm">
+                        {props.commentData.comment}
+                    </Text>
+                </Box>
             </CardBody>
         </Card>
     )
