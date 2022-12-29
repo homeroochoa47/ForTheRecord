@@ -210,9 +210,9 @@ def retrieve_youtube_comments(request):
         comments = [{'comment': "Sorry, looks like we werent able to find any comments"}]
         #alternatively, return a new render with a separate html file for a new page reading the message we want.
     
-    #comments=json.dumps(comments)
-    #print(f'\n\n\nCOMMENTS JSON HERE{json.dumps(comments)}')
-    #this will be used to save the comments in the api CommentList model as a json
+    #first sorting the comments in descending order of length for easier presentation on the fron end.
+    comments = sorted(comments, key=lambda x: len(x['comment']), reverse=True)
+    
     comment_list = CommentList(new_comments=comments, song=current_song)
     comment_list.save()
     
