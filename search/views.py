@@ -28,8 +28,8 @@ class SpotifyAuth(APIView):
         url = Request('GET', 'https://accounts.spotify.com/authorize', params={
             'scope': scopes,
             'response_type': 'code',
-            'redirect_uri': REDIRECT_URI ,
-            'client_id': CLIENT_ID
+            'redirect_uri': os.environ['REDIRECT_URI'],
+            'client_id': os.environ['CLIENT_ID']
         }).prepare().url
         
         return Response({'spotify_auth_url': url}, status=status.HTTP_200_OK)
@@ -41,9 +41,9 @@ def spotify_callback(request):
     response = post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'authorization_code',
         'code': code,
-        'redirect_uri': REDIRECT_URI,
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET
+        'redirect_uri': os.environ['REDIRECT_URI'],
+        'client_id': os.environ['CLIENT_ID'],
+        'client_secret': os.environ['CLIENT_SECRET']
     }).json()
                                                          
     #storing data from the json above
@@ -137,9 +137,9 @@ def search_youtube_videos(request):
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     #taken from the youtube data api
     youtube = googleapiclient.discovery.build(
-        api_service_name,
-        api_version, 
-        developerKey = youtube_api_key
+        os.environ['api_service_name'],
+        os.environ['api_version'], 
+        developerKey = os.environ['youtube_api_key']
     )
     
     req = youtube.search().list(
@@ -175,9 +175,9 @@ def retrieve_youtube_comments(request):
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     
     youtube = googleapiclient.discovery.build(
-        api_service_name, 
-        api_version, 
-        developerKey = youtube_api_key
+        os.environ['api_service_name'], 
+        os.environ['api_version'], 
+        developerKey = os.environ['youtube_api_key']
     )
     
     #for each of the three video ids, get the comments
