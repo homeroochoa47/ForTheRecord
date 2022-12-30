@@ -17,6 +17,7 @@ export default function App() {
         <Box bg={useColorModeValue('#D8CFB1', '#112836')} height="auto">
           <Router>
             <Routes>
+              <Route exact path="/" element={<HomePage />} />
               <Route exact path="/home" element={<HomePage />} />
               <Route exact path="/comments" element={<Comments />} />
             </Routes>
