@@ -3,7 +3,7 @@ from api.models import User
 from django.utils import timezone
 from datetime import timedelta
 from requests import post
-from .creds import CLIENT_ID, CLIENT_SECRET
+import os
 from requests import post, get
 
 def get_user_auth_data(user_id):
@@ -72,8 +72,8 @@ def refresh_spotify_token(user_id):
     response = post('https://accounts.spotify.com/api/token', data={
         'grant_type': 'refresh_token',
         'refresh_token': refresh_token,
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
+        'client_id': os.environ['CLIENT_ID'],
+        'client_secret': os.environ['CLIENT_SECRET'],
     }).json()
     
     access_token = response.get('access_token')
