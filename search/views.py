@@ -1,7 +1,7 @@
 from json import JSONDecodeError, dumps
 from django.shortcuts import render, redirect
 from requests import Request, post, get
-from .creds import REDIRECT_URI, CLIENT_ID, CLIENT_SECRET, youtube_api_key, api_service_name, api_version
+#from .creds import REDIRECT_URI, CLIENT_ID, CLIENT_SECRET, youtube_api_key, api_service_name, api_version
 from .utils import create_or_update_auth_info, check_or_update_spotify_token_status, get_user_auth_data, retrieve_comment_info_from_json, retrieve_sporify_user_data, get_user_from_api_model
 import html
 from rest_framework.views import APIView
