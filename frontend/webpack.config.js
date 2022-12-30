@@ -1,16 +1,19 @@
-const path = require("path");
+// webpack.config.js example
+const path = require('path');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const {WebpackManifestPlugin} = require('webpack-manifest-plugin');
 const webpack = require("webpack");
 
 module.exports = {
   entry: "./src/index.js",
+  plugins: [
+    new WebpackManifestPlugin(), 
+    new CleanWebpackPlugin(),  
+  ],
   output: {
     path: path.resolve(__dirname, "./static/frontend"), // Should be in STATICFILES_DIRS
-    publicPath: "/static/", // Should match Django STATIC_URL
+    publicPath: '',
     filename: "[name].js", // No filename hashing, Django takes care of this
-    chunkFilename: "[id]-[chunkhash].js"
-  },
-  devServer: {
-    writeToDisk: true, // Write files to disk in dev mode, so Django can serve the assets
   },
   module: {
     rules: [
@@ -25,13 +28,5 @@ module.exports = {
   },
   optimization: {
     minimize: true,
-  },
-  plugins: [
-    new webpack.DefinePlugin({
-      "process.env": {
-        // This has effect on the react lib size
-        NODE_ENV: JSON.stringify("development"),
-      },
-    }),
-  ],
-};
+  }
+}
