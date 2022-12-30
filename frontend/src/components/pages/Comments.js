@@ -14,6 +14,9 @@ export function Comments() {
       async function fetchData() {
         const response = await fetch('search/check_for_auth');
         const data = await response.json();
+        if ('spotify_auth_url' in data) {
+          window.open(data.spotify_auth_url)
+        }
         console.log(data)
         setSongInfo(data);
         setIsLoading(false);
